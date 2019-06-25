@@ -1,0 +1,14 @@
+{
+  "name": "dengine",
+  "version": "0.0.0",
+  "description": "A dice roll engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SAKATA Sinji <sinji@sakasin.net> (https://sakasin.net)",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.5.2"
+  }
+}
