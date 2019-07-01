@@ -2,13 +2,21 @@
   "name": "dengine",
   "version": "0.0.0",
   "description": "A dice roll engine",
-  "main": "index.js",
+  "main": "dist/src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jest"
   },
   "author": "SAKATA Sinji <sinji@sakasin.net> (https://sakasin.net)",
   "license": "MIT",
   "dependencies": {
+    "random-js": "^2.1.0",
     "typescript": "^3.5.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.0.10",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
   }
 }
