@@ -1,5 +1,6 @@
 import { Result, Status } from "../interface";
 import Random from "../random";
+import { newResult } from "../helper";
 
 export default class Cthulhu {
   prefixes = ["CC", "CCB"];
@@ -9,7 +10,7 @@ export default class Cthulhu {
     let idx = 1;
 
     if (cmd == "CC" || cmd == "CCB") {
-      let option: Option = {};
+      let option: skillCheckOption = {};
       if (tokens[idx] == "(") {
         option.brokenNumber = parseInt(tokens[idx + 1]);
         idx += 3; // take ["(", Number, ")"]
@@ -24,12 +25,15 @@ export default class Cthulhu {
     }
 
     if (cmd == "RES" || cmd == "RESB") {
+      const a = parseInt(tokens[idx + 1]);
+      const b = parseInt(tokens[idx + 3]);
+      return this.regist(rand, cmd, a - b);
     } else if (cmd == "CBR" || cmd == "CBRB") {
     }
     return null;
   }
 
-  skillCheck(rand: Random, cmd: string, option: Option): Result {
+  skillCheck(rand: Random, cmd: string, option: skillCheckOption): Result {
     const [critical, fumble] = this.getCritical(cmd);
     const total = rand.D100();
     const dice = rand.dice;
@@ -106,6 +110,43 @@ export default class Cthulhu {
     }
   }
 
+  regist(rand: Random, cmd: string, diff: number) {
+    const parsentail = diff * 5 + 50;
+
+    if (parsentail <= 0) {
+      return this.getAutoChecked(parsentail, "自動失敗");
+    }
+
+    if (parsentail > 100) {
+      return this.getAutoChecked(parsentail, "自動成功");
+    }
+
+    const [critical, fumble] = this.getCritical(cmd);
+    let result = newResult();
+    result.total = rand.D100();
+    result.dice = rand.dice;
+    result.actions.push(`1D100<=${parsentail}`);
+
+    result.mainMassage = this.getParsentailText(
+      result.total,
+      parsentail,
+      critical,
+      fumble
+    );
+    result.messages.push(result.total.toString());
+    result.messages.push(result.mainMassage);
+
+    return result;
+  }
+
+  getAutoChecked(parsentail: number, message: string): Result {
+    let result = newResult();
+    result.actions = [`1D100<=${parsentail}`];
+    result.messages = [message];
+    result.mainMassage = message;
+    return result;
+  }
+
   getCritical(cmd: string): [number, number] {
     let critical, fumble;
     if (cmd.endsWith("B")) {
@@ -120,7 +161,7 @@ export default class Cthulhu {
   }
 }
 
-interface Option {
+interface skillCheckOption {
   parsentail?: number;
   brokenNumber?: number;
 }
