@@ -1,12 +1,12 @@
 export default class Lexer {
-  str:string;
+  str: string;
   constructor(str: string) {
     this.str = str;
   }
 
   lex(): string[] {
     let tokens: string[] = [];
-    while(this.str.length != 0) {
+    while (this.str.length != 0) {
       this.skipBlank();
       tokens.push(this.take());
     }
@@ -14,16 +14,14 @@ export default class Lexer {
   }
 
   skipBlank() {
-    let idx = 0;
-    while(this.str[idx] == ' ') {
-      idx++;
+    const matched = this.str.match(/^\s+/);
+    if (matched) {
+      this.str = this.str.substring(matched[0].length);
     }
-
-    this.str = this.str.substring(idx);
   }
 
   take(): string {
-    const regexs = [/^[a-zA-Z]+/, /^\d+/, /^(\+|\-|\*|\/)/, /^(>=|<=|>|<|==|=)/, /^(\(|\)|@)/, /^\[.*\]/]
+    const regexs = [/^[a-zA-Z]+/, /^\d+/, /^(>=|<=|==)/, /^\[.*\]/];
     for (let regex of regexs) {
       let match = this.str.match(regex);
       if (match != null) {
@@ -33,6 +31,9 @@ export default class Lexer {
       }
     }
 
-    return "";
+    const token = this.str[0];
+    this.str = this.str.substring(1);
+
+    return token;
   }
 }
