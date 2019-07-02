@@ -1,5 +1,5 @@
-import { Random as RandomJS, MersenneTwister19937 } from "random-js"
-import { Dice } from "./interface"
+import { Random as RandomJS, MersenneTwister19937 } from "random-js";
+import { Dice } from "./interface";
 
 export default class Random {
   rand: RandomJS;
@@ -23,7 +23,7 @@ export default class Random {
 
   D(faces: number): number {
     const value = this.rand.integer(1, faces);
-    this.dice.push({faces, value});
+    this.dice.push({ faces, value });
     return value;
   }
 }
