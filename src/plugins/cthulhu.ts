@@ -1,6 +1,7 @@
 import { Result, Status } from "../interface";
 import Random from "../random";
 import { newResult } from "../helper";
+import { parseArithmetic } from "../parser";
 
 export default class Cthulhu {
   prefixes = ["CC", "CCB"];
@@ -17,8 +18,7 @@ export default class Cthulhu {
       }
 
       if (tokens[idx] == "<=") {
-        option.parsentail = parseInt(tokens[idx + 1]);
-        idx += 2; // take ["<=", Number]
+        [idx, option.parsentail] = parseArithmetic(tokens, idx + 1);
       }
 
       return this.skillCheck(rand, cmd, option);
