@@ -28,13 +28,17 @@ export default class Cthulhu {
       const a = parseInt(tokens[idx + 1]);
       const b = parseInt(tokens[idx + 3]);
       return this.regist(rand, cmd, a - b);
-    } else if (cmd == "CBR" || cmd == "CBRB") {
+    }
+
+    if (cmd == "CBR" || cmd == "CBRB") {
+      const a = parseInt(tokens[idx + 1]);
+      const b = parseInt(tokens[idx + 3]);
+      return this.combination(rand, cmd, a, b);
     }
     return null;
   }
 
   skillCheck(rand: Random, cmd: string, option: skillCheckOption): Result {
-    const [critical, fumble] = this.getCritical(cmd);
     const total = rand.D100();
     const dice = rand.dice;
     const isSecret = false;
@@ -55,12 +59,7 @@ export default class Cthulhu {
     messages.push(total.toString());
 
     if (option.parsentail) {
-      const msg = this.getParsentailText(
-        total,
-        option.parsentail,
-        critical,
-        fumble
-      );
+      const msg = this.getParsentailText(total, option.parsentail, cmd);
       mainMsgs.push(msg);
       status = total <= option.parsentail ? Status.Success : Status.Failure;
     }
@@ -80,12 +79,8 @@ export default class Cthulhu {
     return { total, dice, isSecret, status, actions, messages, mainMassage };
   }
 
-  getParsentailText(
-    total: number,
-    parsentail: number,
-    critical: number,
-    fumble: number
-  ): string {
+  getParsentailText(total: number, parsentail: number, cmd: string): string {
+    const [critical, fumble] = this.getCritical(cmd);
     const special = Math.floor(parsentail * 0.2);
     if (total <= parsentail) {
       if (total <= special) {
@@ -114,36 +109,65 @@ export default class Cthulhu {
     const parsentail = diff * 5 + 50;
 
     if (parsentail <= 0) {
-      return this.getAutoChecked(parsentail, "自動失敗");
+      return this.getAutoChecked(parsentail, "自動失敗", false);
     }
 
-    if (parsentail > 100) {
-      return this.getAutoChecked(parsentail, "自動成功");
+    if (parsentail >= 100) {
+      return this.getAutoChecked(parsentail, "自動成功", true);
     }
 
-    const [critical, fumble] = this.getCritical(cmd);
     let result = newResult();
     result.total = rand.D100();
     result.dice = rand.dice;
     result.actions.push(`1D100<=${parsentail}`);
 
-    result.mainMassage = this.getParsentailText(
-      result.total,
-      parsentail,
-      critical,
-      fumble
-    );
+    result.mainMassage = this.getParsentailText(result.total, parsentail, cmd);
     result.messages.push(result.total.toString());
     result.messages.push(result.mainMassage);
 
     return result;
   }
 
-  getAutoChecked(parsentail: number, message: string): Result {
+  getAutoChecked(
+    parsentail: number,
+    message: string,
+    isSuccess: boolean
+  ): Result {
     let result = newResult();
+    result.status = isSuccess ? Status.Success : Status.Failure;
     result.actions = [`1D100<=${parsentail}`];
     result.messages = [message];
     result.mainMassage = message;
+    return result;
+  }
+
+  combination(
+    rand: Random,
+    cmd: string,
+    parsentail1: number,
+    parsentail2: number
+  ): Result {
+    let result = newResult();
+    result.total = rand.D100();
+
+    result.actions.push(`1D100<=${parsentail1},${parsentail2}`);
+
+    const result1 = this.getParsentailText(result.total, parsentail1, cmd);
+    const result2 = this.getParsentailText(result.total, parsentail2, cmd);
+
+    if (result.total <= parsentail1 && result.total <= parsentail2) {
+      result.mainMassage = "成功";
+      result.status = Status.Success;
+    } else if (result.total <= parsentail1 || result.total <= parsentail2) {
+      result.mainMassage = "部分的成功";
+      result.status = Status.Unknown;
+    } else {
+      result.mainMassage = "失敗";
+      result.status = Status.Failure;
+    }
+    result.messages.push(`${result.total}[${result1},${result2}]`);
+    result.messages.push(result.mainMassage);
+
     return result;
   }
 
@@ -154,7 +178,7 @@ export default class Cthulhu {
       fumble = 96;
     } else {
       critical = 1;
-      fumble = 99;
+      fumble = 100;
     }
 
     return [critical, fumble];
