@@ -51,24 +51,23 @@ export default class Cthulhu {
     const effect = option.parsentail ? `1D100<=${option.parsentail}` : "1D100";
     actions.push(effect);
 
+    let isBroken = false;
     if (option.brokenNumber) {
       actions.push(`故障ナンバー[${option.brokenNumber}]`);
+      isBroken = total >= option.brokenNumber;
     }
 
     // messages
     messages.push(total.toString());
 
-    if (option.parsentail) {
+    if (option.parsentail && isBroken) {
+      const msg = this.getBrokenText(total, option.parsentail, cmd);
+      mainMsgs.push(msg);
+      status = Status.Failure;
+    } else if (option.parsentail) {
       const msg = this.getParsentailText(total, option.parsentail, cmd);
       mainMsgs.push(msg);
       status = total <= option.parsentail ? Status.Success : Status.Failure;
-    }
-
-    if (option.brokenNumber) {
-      if (total >= option.brokenNumber) {
-        const msg = "故障";
-        mainMsgs.push(msg);
-      }
     }
 
     let mainMassage = mainMsgs.join("/");
@@ -169,6 +168,19 @@ export default class Cthulhu {
     result.messages.push(result.mainMassage);
 
     return result;
+  }
+
+  getBrokenText(total: number, parsentail: number, cmd: string): string {
+    const [, fumble] = this.getCritical(cmd);
+    if (fumble <= total) {
+      if (total <= parsentail) {
+        return "故障";
+      } else {
+        return "致命的失敗/故障";
+      }
+    } else {
+      return "故障";
+    }
   }
 
   getCritical(cmd: string): [number, number] {
