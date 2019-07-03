@@ -16,10 +16,26 @@ export default class RandomMock extends Random {
     this.index = 0;
   }
 
-  D(_: number): number {
+  D(faces: number): number {
     if (this.index >= this.rands.length) {
-      return -1;
+      throw new Error("Random is called more than expected");
+    }
+    if (this.rands[this.index].faces != faces) {
+      throw new DiceMissmatchError(this.rands[this.index], faces);
     }
     return this.rands[this.index++].value;
+  }
+}
+
+class DiceMissmatchError implements Error {
+  name = "DiceMissmatchError";
+  message: string;
+
+  constructor(public expected: Dice, public actual: number) {
+    this.message = `${this.name}: expected ${this.expected.value}/${this.expected.faces}, actual face ${this.actual}`;
+  }
+
+  toString() {
+    return this.message;
   }
 }
