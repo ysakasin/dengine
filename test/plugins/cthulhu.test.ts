@@ -2,8 +2,9 @@ import Cthulhu from "../../src/plugins/cthulhu";
 import Lexer from "../../src/lexer";
 import RandomMock from "../rand_mock";
 import { getFullText } from "../../src/helper";
+import { Plugin } from "../../src/interface";
 
-let plugin = new Cthulhu();
+let plugin: Plugin = Cthulhu;
 
 test("RES(12-10) 1%", () => {
   let randMock = new RandomMock("83/100");
