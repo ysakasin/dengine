@@ -98,7 +98,10 @@ class ArithmeticParser {
 
   expect(token: string) {
     if (this.curToken() != token) {
-      throw new ParseError(`Unexpected token. expected: ${token}, actual: ${this.curToken()}`, this.index);
+      throw new ParseError(
+        `Unexpected token. expected: ${token}, actual: ${this.curToken()}`,
+        this.index
+      );
     }
     this.next();
   }
