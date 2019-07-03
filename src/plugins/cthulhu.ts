@@ -53,7 +53,12 @@ export default {
       }
 
       if (tokens[idx] == "<=") {
-        [idx, option.parsentail] = parseArithmetic(tokens, idx + 1);
+        const arithmetic = parseArithmetic(tokens, idx + 1);
+        if (arithmetic == null) {
+          return null;
+        }
+
+        [idx, option.parsentail] = arithmetic;
       }
 
       return skillCheck(rand, cmd, option);

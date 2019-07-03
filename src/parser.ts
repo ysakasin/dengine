@@ -1,10 +1,14 @@
 export function parseArithmetic(
   tokens: string[],
   index: number = 0
-): [number, number] {
-  let parser = new ArithmeticParser(tokens, index);
-  const res = parser.parse();
-  return [parser.index, res];
+): [number, number] | null {
+  try {
+    let parser = new ArithmeticParser(tokens, index);
+    const res = parser.parse();
+    return [parser.index, res];
+  } catch {
+    return null;
+  }
 }
 
 class ArithmeticParser {
@@ -23,7 +27,7 @@ class ArithmeticParser {
   parseAdd(): number {
     let left = this.parseMul();
 
-    let op: string = this.tokens[this.index];
+    let op: string = this.curToken();
     while (op == "+" || op == "-") {
       if (op == "+") {
         this.next();
@@ -32,40 +36,57 @@ class ArithmeticParser {
         this.next();
         left = left - this.parseMul();
       }
-      op = this.tokens[this.index];
+      op = this.curToken();
     }
     return left;
   }
 
   parseMul(): number {
-    let left = this.parseNumber();
+    let left = this.parseTerm();
 
-    let op: string = this.tokens[this.index];
+    let op: string = this.curToken();
     while (op == "*" || op == "/") {
       if (op == "*") {
         this.next();
-        left = left * this.parseNumber();
+        left = left * this.parseTerm();
       } else if (op == "/") {
         this.next();
-        left = left / this.parseNumber();
+        left = left / this.parseTerm();
       }
-      op = this.tokens[this.index];
+      op = this.curToken();
     }
     return left;
   }
 
-  parseNumber(): number {
-    if (this.tokens[this.index] == "(") {
+  parseTerm(): number {
+    if (this.curToken() == "(") {
       this.next(); // take "("
       const ret = this.parse();
-      this.next(); // take ")"
+      this.expect(")");
       return ret;
     }
-    if (this.tokens[this.index] == "-") {
+    if (this.curToken() == "-") {
       this.next();
-      return -parseInt(this.tokens[this.next()]);
+      return -this.parseNumber();
     }
-    return parseInt(this.tokens[this.next()]);
+    if (this.curToken() == "+") {
+      this.next();
+      return this.parseNumber();
+    }
+    return this.parseNumber();
+  }
+
+  parseNumber(): number {
+    const token = this.curToken();
+    if (!/^\d+$/.test(token)) {
+      throw new ParseError("Current token is not Number string.", this.index);
+    }
+    this.next();
+    return parseInt(token);
+  }
+
+  curToken(): string {
+    return this.tokens[this.index];
   }
 
   next(): number {
@@ -73,6 +94,13 @@ class ArithmeticParser {
       throw new ParseError("Already reached End of Tokens", this.index);
     }
     return this.index++;
+  }
+
+  expect(token: string) {
+    if (this.curToken() != token) {
+      throw new ParseError(`Unexpected token. expected: ${token}, actual: ${this.curToken()}`, this.index);
+    }
+    this.next();
   }
 }
 
