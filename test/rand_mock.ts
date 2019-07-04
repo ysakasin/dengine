@@ -23,7 +23,10 @@ export default class RandomMock extends Random {
     if (this.rands[this.index].faces != faces) {
       throw new DiceMissmatchError(this.rands[this.index], faces);
     }
-    return this.rands[this.index++].value;
+
+    const value = this.rands[this.index++].value;
+    this.dice.push({ faces, value });
+    return value;
   }
 }
 

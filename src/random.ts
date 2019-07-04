@@ -9,6 +9,10 @@ export default class Random {
     this.rand = new RandomJS(MersenneTwister19937.autoSeed());
   }
 
+  D6(): number {
+    return this.D(6);
+  }
+
   D100(): number {
     return this.D(100);
   }
