@@ -4,8 +4,7 @@ export function getFullText(result: Result | null) {
   if (result == null) {
     return "";
   }
-  const msgs = result.actions.concat(result.messages);
-  return msgs.join(" ＞ ");
+  return result.process.join(" ＞ ");
 }
 
 export function newResult(): Result {
@@ -14,8 +13,7 @@ export function newResult(): Result {
     total: 0,
     isSecret: false,
     status: Status.Unknown,
-    actions: [],
-    messages: [],
+    process: [],
     mainMassage: ""
   };
 }

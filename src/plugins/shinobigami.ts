@@ -61,9 +61,7 @@ function rollTable(
   result.total = rand.nDk(times, faces);
   result.dice = rand.dice;
   result.mainMassage = table.table[result.total - times];
-  result.actions.push(table.name);
-  result.messages.push(getDiceMessage(result.total, result.dice));
-  result.messages.push(result.mainMassage);
+  result.process.push(table.name, getDiceMessage(result.total, result.dice), result.mainMassage);
   return result;
 }
 
@@ -177,13 +175,13 @@ function randomSkillTable(rand: Random) {
   const skill = skillTable[skillDice - 2];
 
   let result = newResult();
-  result.actions.push("ランダム指定特技表");
+  result.process.push("ランダム指定特技表");
   result.dice = rand.dice;
   result.mainMassage = `『${kind}』${skill}`;
-  result.messages.push(
+  result.process.push(
     `${kindDice}, ${skillDice}[${rand.dice[1].value},${rand.dice[2].value}]`
   );
-  result.messages.push(result.mainMassage);
+  result.process.push(result.mainMassage);
   return result;
 }
 
@@ -199,11 +197,11 @@ function metamorphoseTable(rand: Random): Result {
 
   const firstDice = rand.D6();
   let result = newResult();
-  result.actions.push("異形表");
+  result.process.push("異形表");
 
   result.mainMassage = table[firstDice - 1];
-  result.messages.push(firstDice.toString());
-  result.messages.push(result.mainMassage);
+  result.process.push(firstDice.toString());
+  result.process.push(result.mainMassage);
 
   if (firstDice <= 3) {
     const powerTables = [
@@ -248,9 +246,9 @@ function metamorphoseTable(rand: Random): Result {
     const powerTable = powerTables[firstDice - 1];
     const secondDice = rand.D6();
     const text = powerTable.table[secondDice - 1] + powerTable.page;
-    result.messages.push(powerTable.name);
-    result.messages.push(secondDice.toString());
-    result.messages.push(text);
+    result.process.push(powerTable.name);
+    result.process.push(secondDice.toString());
+    result.process.push(text);
     result.mainMassage += " ＞ " + text;
   }
 

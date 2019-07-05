@@ -5,8 +5,7 @@ export interface Result {
   total: number;
   isSecret: boolean;
   status: Status;
-  actions: string[];
-  messages: string[];
+  process: string[];
   mainMassage: string;
 }
 

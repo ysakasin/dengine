@@ -84,43 +84,41 @@ function skillCheck(
   cmd: string,
   option: skillCheckOption
 ): Result {
-  const total = rand.D100();
-  const dice = rand.dice;
-  const isSecret = false;
-  let status = Status.Unknown;
-  let actions: string[] = [];
-  let messages: string[] = [];
-  let mainMsgs: string[] = [];
+  let result = newResult();
+
+  result.total = rand.D100();
+  result.dice = rand.dice;
 
   // actions
   const effect = option.parsentail ? `1D100<=${option.parsentail}` : "1D100";
-  actions.push(effect);
+  result.process.push(effect);
 
   let isBroken = false;
   if (option.brokenNumber) {
-    actions.push(`故障ナンバー[${option.brokenNumber}]`);
-    isBroken = total >= option.brokenNumber;
+    result.process.push(`故障ナンバー[${option.brokenNumber}]`);
+    isBroken = result.total >= option.brokenNumber;
   }
 
   // messages
-  messages.push(total.toString());
+  result.process.push(result.total.toString());
 
+  let mainMsgs: string[] = [];
   if (option.parsentail && isBroken) {
-    const msg = getBrokenText(total, option.parsentail, cmd);
+    const msg = getBrokenText(result.total, option.parsentail, cmd);
     mainMsgs.push(msg);
-    status = Status.Failure;
+    result.status = Status.Failure;
   } else if (option.parsentail) {
-    const msg = getParsentailText(total, option.parsentail, cmd);
+    const msg = getParsentailText(result.total, option.parsentail, cmd);
     mainMsgs.push(msg);
-    status = total <= option.parsentail ? Status.Success : Status.Failure;
+    result.status = result.total <= option.parsentail ? Status.Success : Status.Failure;
   }
 
-  let mainMassage = mainMsgs.join("/");
-  if (mainMassage != "") {
-    messages.push(mainMassage);
+  result.mainMassage = mainMsgs.join("/");
+  if (result.mainMassage != "") {
+    result.process.push(result.mainMassage);
   }
 
-  return { total, dice, isSecret, status, actions, messages, mainMassage };
+  return result
 }
 
 function getParsentailText(
@@ -157,34 +155,33 @@ function regist(rand: Random, cmd: string, diff: number) {
   const parsentail = diff * 5 + 50;
 
   if (parsentail <= 0) {
-    return getAutoChecked(parsentail, "自動失敗", false);
+    return getExactlyResult(parsentail, "自動失敗", false);
   }
 
   if (parsentail >= 100) {
-    return getAutoChecked(parsentail, "自動成功", true);
+    return getExactlyResult(parsentail, "自動成功", true);
   }
 
   let result = newResult();
   result.total = rand.D100();
   result.dice = rand.dice;
-  result.actions.push(`1D100<=${parsentail}`);
-
   result.mainMassage = getParsentailText(result.total, parsentail, cmd);
-  result.messages.push(result.total.toString());
-  result.messages.push(result.mainMassage);
+
+  result.process.push(`1D100<=${parsentail}`);
+  result.process.push(result.total.toString());
+  result.process.push(result.mainMassage);
 
   return result;
 }
 
-function getAutoChecked(
+function getExactlyResult(
   parsentail: number,
   message: string,
   isSuccess: boolean
 ): Result {
   let result = newResult();
   result.status = isSuccess ? Status.Success : Status.Failure;
-  result.actions = [`1D100<=${parsentail}`];
-  result.messages = [message];
+  result.process = [`1D100<=${parsentail}`, message];
   result.mainMassage = message;
   return result;
 }
@@ -198,7 +195,7 @@ function combination(
   let result = newResult();
   result.total = rand.D100();
 
-  result.actions.push(`1D100<=${parsentail1},${parsentail2}`);
+  result.process.push(`1D100<=${parsentail1},${parsentail2}`);
 
   const result1 = getParsentailText(result.total, parsentail1, cmd);
   const result2 = getParsentailText(result.total, parsentail2, cmd);
@@ -213,8 +210,8 @@ function combination(
     result.mainMassage = "失敗";
     result.status = Status.Failure;
   }
-  result.messages.push(`${result.total}[${result1},${result2}]`);
-  result.messages.push(result.mainMassage);
+  result.process.push(`${result.total}[${result1},${result2}]`);
+  result.process.push(result.mainMassage);
 
   return result;
 }
