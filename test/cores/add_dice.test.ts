@@ -126,6 +126,58 @@ test("1D6 + 1 + 2D3", () => {
   expect(res!.isSecret).toBe(false);
 });
 
+test("Div floor", () => {
+  const randMock = new RandomMock("3/6");
+  const input = "1D6/2";
+
+  const res = rollAddDice(randMock, input);
+  expect(res).not.toBeNull();
+  expect(res!.total).toBe(1);
+  expect(res!.mainMassage).toBe("1");
+  expect(res!.status).toBe(Status.Unknown);
+  expect(res!.process).toStrictEqual(["1D6 / 2", "3[3] / 2", "1"]);
+  expect(res!.isSecret).toBe(false);
+});
+
+test("Div ceil", () => {
+  const randMock = new RandomMock("3/6");
+  const input = "1D6/2U";
+
+  const res = rollAddDice(randMock, input);
+  expect(res).not.toBeNull();
+  expect(res!.total).toBe(2);
+  expect(res!.mainMassage).toBe("2");
+  expect(res!.status).toBe(Status.Unknown);
+  expect(res!.process).toStrictEqual(["1D6 / 2U", "3[3] / 2U", "2"]);
+  expect(res!.isSecret).toBe(false);
+});
+
+test("Div round upper case", () => {
+  const randMock = new RandomMock("5/6");
+  const input = "1D6/3R";
+
+  const res = rollAddDice(randMock, input);
+  expect(res).not.toBeNull();
+  expect(res!.total).toBe(2);
+  expect(res!.mainMassage).toBe("2");
+  expect(res!.status).toBe(Status.Unknown);
+  expect(res!.process).toStrictEqual(["1D6 / 3R", "5[5] / 3R", "2"]);
+  expect(res!.isSecret).toBe(false);
+});
+
+test("Div round down case", () => {
+  const randMock = new RandomMock("4/6");
+  const input = "1D6/3R";
+
+  const res = rollAddDice(randMock, input);
+  expect(res).not.toBeNull();
+  expect(res!.total).toBe(1);
+  expect(res!.mainMassage).toBe("1");
+  expect(res!.status).toBe(Status.Unknown);
+  expect(res!.process).toStrictEqual(["1D6 / 3R", "4[4] / 3R", "1"]);
+  expect(res!.isSecret).toBe(false);
+});
+
 test("(1 + 1)D(2 + 4)", () => {
   const randMock = new RandomMock("2/6", "1/6");
   const input = "(1 + 1)D(2 + 4)";

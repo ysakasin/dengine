@@ -102,19 +102,44 @@ class AddDiceParser {
     let op: string = this.curToken();
     while (op == "*" || op == "/") {
       this.next();
-      const right = this.parseD();
-
-      let value: number;
       if (op == "*") {
-        value = left.value * right.value;
+        left = this.parseAsta(left);
       } else {
-        value = Math.floor(left.value / right.value);
+        left = this.parseSlash(left);
       }
 
-      left = this.newNodeBinop(left, op, right, value);
       op = this.curToken();
     }
     return left;
+  }
+
+  parseAsta(left: Node): Node {
+    const right = this.parseD();
+    const value = left.value * right.value;
+
+    return this.newNodeBinop(left, "*", right, value);
+  }
+
+  parseSlash(left: Node): Node {
+    const right = this.parseD();
+    let value = left.value / right.value;
+
+    let opt = this.curToken();
+    if (opt == "R") {
+      this.next();
+      value = Math.round(value);
+    } else if (opt == "U") {
+      this.next();
+      value = Math.ceil(value);
+    } else {
+      opt = "";
+      value = Math.floor(value);
+    }
+
+    right.expr += opt;
+    right.rolledExpr += opt;
+
+    return this.newNodeBinop(left, "/", right, value);
   }
 
   parseD(): Node {
