@@ -61,7 +61,11 @@ function rollTable(
   result.total = rand.nDk(times, faces);
   result.dice = rand.dice;
   result.mainMassage = table.table[result.total - times];
-  result.process.push(table.name, getDiceMessage(result.total, result.dice), result.mainMassage);
+  result.process.push(
+    table.name,
+    getDiceMessage(result.total, result.dice),
+    result.mainMassage
+  );
   return result;
 }
 

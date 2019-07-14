@@ -110,7 +110,8 @@ function skillCheck(
   } else if (option.parsentail) {
     const msg = getParsentailText(result.total, option.parsentail, cmd);
     mainMsgs.push(msg);
-    result.status = result.total <= option.parsentail ? Status.Success : Status.Failure;
+    result.status =
+      result.total <= option.parsentail ? Status.Success : Status.Failure;
   }
 
   result.mainMassage = mainMsgs.join("/");
@@ -118,7 +119,7 @@ function skillCheck(
     result.process.push(result.mainMassage);
   }
 
-  return result
+  return result;
 }
 
 function getParsentailText(
