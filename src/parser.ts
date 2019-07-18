@@ -11,7 +11,7 @@ export function parseArithmetic(
   }
 }
 
-class ArithmeticParser {
+export class ArithmeticParser {
   tokens: string[];
   index: number;
 
