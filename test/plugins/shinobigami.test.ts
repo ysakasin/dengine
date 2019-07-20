@@ -10,8 +10,18 @@ let dengine = new Dengine(plugin);
 test("2d6>=4", () => {
   let randMock = new RandomMock("1/6", "1/6");
   dengine.setRand(randMock);
-  const input = "2d6>=4";
-  const expected = "2D6>=4 ＞ 2[1,1] ＞ 2 ＞ ファンブル";
+  const input = "2D6>=4";
+  const expected = "2D6 >= 4 ＞ 2[1,1] ＞ 2 ＞ ファンブル";
+  const res = dengine.roll(input);
+  expect(getFullText(res)).toBe(expected);
+  expect(res!.isSecret).toBe(false);
+});
+
+test("2d6>=3 + 1", () => {
+  let randMock = new RandomMock("1/6", "1/6");
+  dengine.setRand(randMock);
+  const input = "2D6>= 3 + 1";
+  const expected = "2D6 >= 4 ＞ 2[1,1] ＞ 2 ＞ ファンブル";
   const res = dengine.roll(input);
   expect(getFullText(res)).toBe(expected);
   expect(res!.isSecret).toBe(false);
@@ -20,12 +30,22 @@ test("2d6>=4", () => {
 test("2d6>=4", () => {
   let randMock = new RandomMock("6/6", "6/6");
   dengine.setRand(randMock);
-  const input = "2d6>=4";
+  const input = "2D6>=4";
   const expected =
-    "2D6>=4 ＞ 12[6,6] ＞ 12 ＞ スペシャル(生命点1点か変調1つ回復)";
+    "2D6 >= 4 ＞ 12[6,6] ＞ 12 ＞ スペシャル(生命点1点か変調1つ回復)";
   const res = dengine.roll(input);
   expect(getFullText(res)).toBe(expected);
   expect(res!.isSecret).toBe(false);
+});
+
+test("2d6 + 1 >= 4", () => {
+  let randMock = new RandomMock();
+  dengine.setRand(randMock);
+  const input = "2D6 + 1>=4";
+  const expected =
+    "2D6 + 1 >= 4 ＞ 12[6,6] ＞ 12 ＞ 成功";
+  const res = dengine.roll(input);
+  expect(res).toBeNull();
 });
 
 test("ST", () => {

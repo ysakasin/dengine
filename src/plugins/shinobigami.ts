@@ -1,7 +1,9 @@
-import { Result, Dice } from "../interface";
+import { Result, Dice, Status } from "../interface";
 import Random from "../random";
 import { sceanTable, Table } from "./shinobigami_tables";
-import { newResult } from "../helper";
+import { newResult, joinDiceValue } from "../helper";
+import { ArithmeticParser } from "../parser";
+import { thisTypeAnnotation } from "@babel/types";
 
 const helpMessage: string = `
 ・ (無印)
@@ -31,6 +33,13 @@ export default {
 
   roll(rand: Random, command: string, tokens: string[]): Result | null {
     const cmd = tokens[0];
+
+    try {
+      let s = new SinobiGamiDice(tokens, 0);
+      return s.getResult(rand);
+    } catch {
+      // skip
+    }
 
     let table = sceanTable[cmd];
     if (table) {
@@ -257,4 +266,52 @@ function metamorphoseTable(rand: Random): Result {
   }
 
   return result;
+}
+
+class SinobiGamiDice extends ArithmeticParser {
+
+  getResult(rand: Random): Result {
+    this.expect("2");
+    this.expect("D");
+    this.expect("6");
+
+    this.expect(">=");
+
+    const cond = this.parseAdd();
+
+    const value = rand.nDk(2, 6);
+    const [mainMassage, status] = this.getMassage(value, cond)
+    const process = [
+      `2D6 >= ${cond}`, 
+      `${value}[${joinDiceValue(rand.dice)}]`,
+      value.toString(), 
+      mainMassage]
+    
+    const result : Result ={
+      dice: rand.dice,
+      total: value,
+      mainMassage,
+      status,
+      process,
+      isSecret: false
+    }
+
+    return result;
+  }
+
+  getMassage(value: number, cond: number): [string, Status] {
+    if (value <= 2) {
+      return ["ファンブル", Status.Failure];
+    }
+    else if (value >= 12) {
+      return ["スペシャル(生命点1点か変調1つ回復)"
+      , Status.Success]
+    } else if (value >= cond) {
+      return[ "成功"
+      , Status.Success]
+    } else {
+      return [ "失敗"
+      , Status.Failure]
+    }
+  }
 }
