@@ -42,8 +42,6 @@ test("2d6 + 1 >= 4", () => {
   let randMock = new RandomMock();
   dengine.setRand(randMock);
   const input = "2D6 + 1>=4";
-  const expected =
-    "2D6 + 1 >= 4 ＞ 12[6,6] ＞ 12 ＞ 成功";
   const res = dengine.roll(input);
   expect(res).toBeNull();
 });
