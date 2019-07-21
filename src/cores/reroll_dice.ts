@@ -15,6 +15,14 @@ export default function rerollDice(
   }
 }
 
+export function rerollDiceWithException(
+  rand: Random,
+  tokens: string[]
+): Result | null {
+    let parser = new RerollDiceParser(rand, tokens);
+    return parser.parseResult();
+}
+
 const REROLL_LIMIT = 100;
 
 class RerollDiceParser extends ArithmeticParser {
@@ -26,9 +34,9 @@ class RerollDiceParser extends ArithmeticParser {
   }
 
   parseResult(): Result {
-    const n = this.parseAdd();
+    const n = this.parseTerm();
     this.expect("R");
-    const k = this.parseAdd();
+    const k = this.parseTerm();
 
     const op = this.curToken();
     this.next();

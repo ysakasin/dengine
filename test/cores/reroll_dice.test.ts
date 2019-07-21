@@ -1,11 +1,12 @@
 import RandomMock from "../rand_mock";
-import rerollDice from "../../src/cores/reroll_dice";
+import Random from "../../src/random";
+import {rerollDiceWithException} from "../../src/cores/reroll_dice";
 import Lexer from "../../src/lexer";
 import { Status } from "../../src/interface";
 
-function rollRerollDice(rand: RandomMock, input: string) {
+function rollRerollDice(rand: Random, input: string) {
   const lexer = new Lexer(input);
-  return rerollDice(rand, lexer.lex());
+  return rerollDiceWithException(rand, lexer.lex());
 }
 
 test("2R6>=4", () => {
@@ -105,33 +106,48 @@ test("2R6==4", () => {
 });
 
 test("Nested diceroll on R must be falied", () => {
-  const randMock = new RandomMock();
-  const input = "(1R1)R(2 + 4)";
+  const randMock = new Random();
+  const input = "(1R1)R(2 + 4) >= 6";
 
-  const res = rollRerollDice(randMock, input);
-  expect(res).toBeNull();
+  expect(() => rollRerollDice(randMock, input)).toThrow();
 });
 
 test("unary R must be falied", () => {
-  const randMock = new RandomMock();
-  const input = "R6";
+  const randMock = new Random();
+  const input = "R6 >= 6";
 
-  const res = rollRerollDice(randMock, input);
-  expect(res).toBeNull();
+  expect(() => rollRerollDice(randMock, input)).toThrow();
+});
+
+test("No support add op", () => {
+  const randMock = new Random();
+  const input = "1R6 + 3 >= 6";
+
+  expect(() => rollRerollDice(randMock, input)).toThrow();
 });
 
 test("Right-hand side dice literal is invalid", () => {
-  const randMock = new RandomMock();
-  const input = "1R6 <= 2R6";
+  const randMock = new RandomMock("4/6", "2/6");
+  const input = "1R6 >= 4R6";
 
   const res = rollRerollDice(randMock, input);
-  expect(res).toBeNull();
+  expect(res).not.toBeNull();
+  expect(res).toStrictEqual({
+    total: 1,
+    mainMassage: "成功数1",
+    status: Status.Unknown,
+    process: ["1R6>=4", "4 + 2", "成功数1"],
+    isSecret: false,
+    dice: [
+      { faces: 6, value: 4 },
+      { faces: 6, value: 2 }
+    ]
+  });
 });
 
 test("Invalid case returns null", () => {
-  const randMock = new RandomMock();
+  const randMock = new Random();
   const input = "1RU6";
 
-  const res = rollRerollDice(randMock, input);
-  expect(res).toBeNull();
+  expect(() => rollRerollDice(randMock, input)).toThrow();
 });
