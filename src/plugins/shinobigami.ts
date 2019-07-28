@@ -1,8 +1,8 @@
 import { Result, Dice, Status } from "../interface";
 import Random from "../random";
 import { sceanTable, Table } from "./shinobigami_tables";
-import { newResult, joinDiceValue } from "../helper";
-import { ArithmeticParser } from "../parser";
+import { newResult } from "../helper";
+import { check2D6 } from "../cores/specific_dice";
 
 const helpMessage: string = `
 ・ (無印)
@@ -31,15 +31,12 @@ export default {
   prefixes: Object.keys(sceanTable).concat("RTT", "MT"),
 
   roll(rand: Random, command: string, tokens: string[]): Result | null {
-    const cmd = tokens[0];
-
-    try {
-      let s = new SinobiGamiDice(tokens, 0);
-      return s.getResult(rand);
-    } catch {
-      // skip
+    const skillCheckResult = skillCheck(rand, tokens);
+    if (skillCheckResult) {
+      return skillCheckResult;
     }
 
+    const cmd = tokens[0];
     let table = sceanTable[cmd];
     if (table) {
       if (table.type == "1D6") {
@@ -267,38 +264,8 @@ function metamorphoseTable(rand: Random): Result {
   return result;
 }
 
-class SinobiGamiDice extends ArithmeticParser {
-  getResult(rand: Random): Result {
-    this.expect("2");
-    this.expect("D");
-    this.expect("6");
-
-    this.expect(">=");
-
-    const cond = this.parseAdd();
-
-    const value = rand.nDk(2, 6);
-    const [mainMassage, status] = this.getMassage(value, cond);
-    const process = [
-      `2D6 >= ${cond}`,
-      `${value}[${joinDiceValue(rand.dice)}]`,
-      value.toString(),
-      mainMassage
-    ];
-
-    const result: Result = {
-      dice: rand.dice,
-      total: value,
-      mainMassage,
-      status,
-      process,
-      isSecret: false
-    };
-
-    return result;
-  }
-
-  getMassage(value: number, cond: number): [string, Status] {
+function skillCheck(rand: Random, tokens: string[]) {
+  const ret = check2D6(">=", rand, tokens, (value, cond) => {
     if (value <= 2) {
       return ["ファンブル", Status.Failure];
     } else if (value >= 12) {
@@ -308,5 +275,6 @@ class SinobiGamiDice extends ArithmeticParser {
     } else {
       return ["失敗", Status.Failure];
     }
-  }
+  });
+  return ret;
 }
