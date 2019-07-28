@@ -1,6 +1,6 @@
 import RandomMock from "../rand_mock";
 import Random from "../../src/random";
-import {rerollDiceWithException} from "../../src/cores/reroll_dice";
+import { rerollDiceWithException } from "../../src/cores/reroll_dice";
 import Lexer from "../../src/lexer";
 import { Status } from "../../src/interface";
 
@@ -138,10 +138,7 @@ test("Right-hand side dice literal is invalid", () => {
     status: Status.Unknown,
     process: ["1R6>=4", "4 + 2", "成功数1"],
     isSecret: false,
-    dice: [
-      { faces: 6, value: 4 },
-      { faces: 6, value: 2 }
-    ]
+    dice: [{ faces: 6, value: 4 }, { faces: 6, value: 2 }]
   });
 });
 

@@ -19,8 +19,8 @@ export function rerollDiceWithException(
   rand: Random,
   tokens: string[]
 ): Result | null {
-    let parser = new RerollDiceParser(rand, tokens);
-    return parser.parseResult();
+  let parser = new RerollDiceParser(rand, tokens);
+  return parser.parseResult();
 }
 
 const REROLL_LIMIT = 100;
