@@ -14,7 +14,7 @@ export default function addDice(rand: Random, tokens: string[]): Result | null {
 
 const CONDITION_OPS = ["==", "=", ">", ">=", "<", "<="];
 
-class AddDiceParser {
+export class AddDiceParser {
   rand: Random;
   tokens: string[];
   index: number = 0;
@@ -43,6 +43,7 @@ class AddDiceParser {
 
     let left = this.parseAdd();
     this.result.total = left.value;
+    this.result.dice = this.rand.dice;
 
     if (!left.isRolled) {
       throw new ParseError("Command does not have diceroll expression", 0);
