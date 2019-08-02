@@ -261,6 +261,7 @@ function metamorphoseTable(rand: Random): Result {
     result.mainMassage += " ＞ " + text;
   }
 
+  result.dice = rand.dice;
   return result;
 }
 

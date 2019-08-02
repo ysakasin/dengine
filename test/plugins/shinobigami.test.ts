@@ -1,6 +1,5 @@
 import ShinobiGami from "../../src/plugins/shinobigami";
 import RandomMock from "../rand_mock";
-import { getFullText } from "../../src/helper";
 import { Plugin, Status } from "../../src/interface";
 import Dengine from "../../src/dengine";
 
@@ -402,21 +401,42 @@ test("RTT", () => {
   let randMock = new RandomMock("2/6", "4/6", "3/6");
   dengine.setRand(randMock);
   const input = "RTT";
-  const expected = "ランダム指定特技表 ＞ 2, 7[4,3] ＞ 『体術』歩法";
   const res = dengine.roll(input);
-  expect(getFullText(res)).toBe(expected);
-  expect(res!.isSecret).toBe(false);
+  expect(res).toStrictEqual({
+    total: 0,
+    mainMassage: "『体術』歩法",
+    status: Status.Unknown,
+    process: ["ランダム指定特技表", "2, 7[4,3]", "『体術』歩法"],
+    isSecret: false,
+    dice: [
+      { faces: 6, value: 2 },
+      { faces: 6, value: 4 },
+      { faces: 6, value: 3 }
+    ]
+  });
 });
 
 test("MT", () => {
   let randMock = new RandomMock("2/6", "4/6");
   dengine.setRand(randMock);
   const input = "MT";
-  const expected =
-    "異形表 ＞ 2 ＞ 1D6を振り、「妖魔忍法表B」で、ランダムに忍法の種類を決定する。妖魔化している間、その妖魔忍法を修得しているものとして扱う。この異形は、違う種類の妖魔忍法である限り、違う異形として扱う。 ＞ 妖魔忍法表B ＞ 4 ＞ 【木魂】(怪p.253)";
   const res = dengine.roll(input);
-  expect(getFullText(res)).toBe(expected);
-  expect(res!.isSecret).toBe(false);
+  expect(res).toStrictEqual({
+    total: 0,
+    mainMassage:
+      "1D6を振り、「妖魔忍法表B」で、ランダムに忍法の種類を決定する。妖魔化している間、その妖魔忍法を修得しているものとして扱う。この異形は、違う種類の妖魔忍法である限り、違う異形として扱う。 ＞ 【木魂】(怪p.253)",
+    status: Status.Unknown,
+    process: [
+      "異形表",
+      "2",
+      "1D6を振り、「妖魔忍法表B」で、ランダムに忍法の種類を決定する。妖魔化している間、その妖魔忍法を修得しているものとして扱う。この異形は、違う種類の妖魔忍法である限り、違う異形として扱う。",
+      "妖魔忍法表B",
+      "4",
+      "【木魂】(怪p.253)"
+    ],
+    isSecret: false,
+    dice: [{ faces: 6, value: 2 }, { faces: 6, value: 4 }]
+  });
 });
 
 test("PLST", () => {
