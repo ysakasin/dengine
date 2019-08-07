@@ -19,7 +19,9 @@ export default {
     if (skillCheckResult) {
       return skillCheckResult;
     }
-    return null;
+
+    let sw = new SwordWorld(tokens, rand);
+    return sw.ratingTable();
   }
 };
 
@@ -51,7 +53,7 @@ class SwordWorld extends ArithmeticParser {
     this.random = random;
   }
 
-  ratingTable() {
+  ratingTable(): Result {
     this.expect("K");
     const key = this.parseTerm();
     this.parseOptions();
@@ -98,15 +100,19 @@ class SwordWorld extends ArithmeticParser {
     result.mainMassage = total.toString();
     result.total = total;
     result.dice = this.random.dice;
+    return result;
   }
 
   parseOptions() {
     while (true) {
       const token = this.curToken();
+      if (!token) {
+        break;
+      }
+
       if (token[0] == "[") {
         this.next();
         this.critical = parseInt(token.substr(1));
-        this.expect("]");
       } else if (token == "@") {
         this.next();
         this.critical = this.parseTerm();

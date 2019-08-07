@@ -240,13 +240,7 @@ test("Sk10-1", () => {
     total: 8,
     mainMassage: "8",
     status: Status.Unknown,
-    process: [
-      "KeyNo.10c[10]-1",
-      "2D:[4,6 5,3]=10,8",
-      "5,4-1",
-      "1回転",
-      "8"
-    ],
+    process: ["KeyNo.10c[10]-1", "2D:[4,6 5,3]=10,8", "5,4-1", "1回転", "8"],
     isSecret: true,
     dice: [
       { faces: 6, value: 4 },
