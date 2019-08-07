@@ -71,6 +71,8 @@ class SwordWorld extends ArithmeticParser {
     }
     this.parseOptions();
 
+    const command = this.getCommandText(key, fixedValue);
+
     let val = this.critical; // initiali val is dummy
     let vals: number[] = [];
     while (val >= this.critical) {
@@ -89,14 +91,15 @@ class SwordWorld extends ArithmeticParser {
     }
 
     const ratedVals = vals.map(x => ratingTable[key][x]);
-    const total = ratedVals.reduce((x, y) => x + y);
+    const total = ratedVals.reduce((x, y) => x + y) + fixedValue;
     let result = newResult();
-    result.process.push(this.getDiceText(vals));
+    result.process.push(command);
+    result.process.push(this.getDiceText(vals, fixedValue));
     result.process.push(ratedVals.join(","));
     if (vals.length > 1) {
       result.process.push(`${vals.length - 1}回転`);
+      result.process.push(total.toString());
     }
-    result.process.push(total.toString());
     result.mainMassage = total.toString();
     result.total = total;
     result.dice = this.random.dice;
@@ -150,6 +153,18 @@ class SwordWorld extends ArithmeticParser {
     }
   }
 
+  getCommandText(key: number, fixedValue: number): string {
+    let ret = `KeyNo.${key}c[${this.critical}]`;
+    if (this.destinyChanging) {
+      ret += `m[${this.destinyChanging}]`;
+    }
+    if (this.criticalRay) {
+      ret += `m[${withSign(this.criticalRay)}]`;
+    }
+    ret += withSign(fixedValue);
+    return ret;
+  }
+
   getDiceText(vals: number[]): string {
     const dice = this.random.dice;
     let pairs: string[] = [];
@@ -158,5 +173,15 @@ class SwordWorld extends ArithmeticParser {
     }
 
     return `2D:[${pairs.join(" ")}]=${vals.join(",")}`;
+  }
+}
+
+function withSign(x: number): string {
+  if (x > 0) {
+    return `+${x}`;
+  } else if (x < 0) {
+    return x.toString();
+  } else {
+    return "";
   }
 }
