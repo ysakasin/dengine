@@ -94,10 +94,12 @@ class SwordWorld extends ArithmeticParser {
     const total = ratedVals.reduce((x, y) => x + y) + fixedValue;
     let result = newResult();
     result.process.push(command);
-    result.process.push(this.getDiceText(vals, fixedValue));
-    result.process.push(ratedVals.join(","));
+    result.process.push(this.getDiceText(vals));
+    result.process.push(ratedVals.join(",") + withSign(fixedValue));
     if (vals.length > 1) {
       result.process.push(`${vals.length - 1}回転`);
+      result.process.push(total.toString());
+    } else if (fixedValue != 0) {
       result.process.push(total.toString());
     }
     result.mainMassage = total.toString();

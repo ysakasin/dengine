@@ -21,7 +21,14 @@ export default class Lexer {
   }
 
   take(): string {
-    const regexs = [/^[a-zA-Z]+/, /^\d+/, /^(>=|<=|==)/, /^\[.*\]/];
+    let match = this.str.match(/^[a-zA-Z]+/);
+    if (match != null) {
+      const token = match[0].toUpperCase();
+      this.str = this.str.substring(token.length);
+      return token;
+    }
+
+    const regexs = [/^\d+/, /^(>=|<=|==)/, /^\[.*\]/];
     for (let regex of regexs) {
       let match = this.str.match(regex);
       if (match != null) {

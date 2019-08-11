@@ -2,7 +2,7 @@ import Random from "../random";
 import { Result, Status } from "../interface";
 
 export default function choice(rand: Random, tokens: string[]): Result | null {
-  if (tokens[0] != "choice" || tokens.length < 2) {
+  if (tokens[0] != "CHOICE" || tokens.length < 2) {
     return null;
   }
 
