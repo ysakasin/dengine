@@ -12,7 +12,7 @@ export default {
   id: "SwordWorld",
   name: "ソードワールド",
   helpMessage,
-  prefixes: [],
+  prefixes: ["K"],
 
   roll(rand: Random, command: string, tokens: string[]): Result | null {
     const skillCheckResult = skillCheck(rand, tokens);
